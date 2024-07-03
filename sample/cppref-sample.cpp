@@ -40,7 +40,7 @@
 #include <random>
 #include <cmath>
 
-#include "pcg_random.hpp"
+#include "pcg/pcg_random.hpp"
  
 int main()
 {

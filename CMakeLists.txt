@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.21)
+
+project(pcgrandom CXX)
+
+# Define library
+add_library(pcg INTERFACE 
+   include/pcg/pcg_extras.hpp
+   include/pcg/pcg_random.hpp
+   include/pcg/pcg_uint128.hpp
+)
+add_library(pcg::pcg ALIAS pcg)
+target_include_directories(pcg INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_compile_features(pcg INTERFACE cxx_std_17)
+
+
+# Add samples
+if(PROJECT_IS_TOP_LEVEL)
+  add_subdirectory(sample)
+endif()

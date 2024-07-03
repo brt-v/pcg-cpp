@@ -34,10 +34,14 @@
 #include <cstdint>
 #include <iostream>
 #include <random>
+#include "pcg//pcg_random.hpp"
 
-#include <unistd.h>             // We use POSIX read/write for binary I/O
+#ifdef _MSC_VER
+    #include <io.h>
+#else
+    #include <unistd.h>
+#endif
 
-#include "pcg_random.hpp"
 
 int main()
 {

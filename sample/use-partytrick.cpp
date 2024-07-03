@@ -35,10 +35,14 @@
 #include <sstream>
 #include <string>
 #include <random>
+#include "pcg/pcg_random.hpp"
 
-#include <unistd.h>
+#ifdef _MSC_VER
+    #include <io.h>
+#else
+    #include <unistd.h>
+#endif
 
-#include "pcg_random.hpp"
 
 static const char* saved_state = 
  "6364136223846793005 3503324247726078831 6557656048857751321 103238831 "

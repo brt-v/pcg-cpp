@@ -31,7 +31,7 @@
 #include <iostream>
 #include <random>
 
-#include "pcg_random.hpp"
+#include "pcg/pcg_random.hpp"
 
 /* 256 bytes of "non-random" data we want to place in the output sequence
  * of our 64-dimensionally equidistributed 32-bit (4 byte) integers
