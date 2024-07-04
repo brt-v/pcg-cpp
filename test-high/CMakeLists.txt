@@ -4,37 +4,56 @@ function(create_pcgtest TEST_NAME)
     add_executable(${TEST_NAME} ${TEST_NAME}.cpp)
     target_link_libraries(${TEST_NAME} PRIVATE pcg::pcg)
 
-    # define tests
-    # add_test(
-    #     NAME ${TEST_NAME}
-    #     COMMAND $<TARGET_FILE:${TEST_NAME}>
-    # )
-
-    # add_custom_command(
-    #     TARGET ${TEST_NAME}
-    #     POST_BUILD
-    #     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/expected
-    # )
-    
-    # add_test(
-    #     NAME Test_${TEST_NAME} 
-    #     COMMAND ${CMAKE_COMMAND} -E compare_files out.txt ${TEST_NAME}.out
-    #     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test
-    # )
-
+    # Runs a test and writes output to a check-*.res file
     add_test(
         NAME ${TEST_NAME}_run
-        COMMAND $<TARGET_FILE:${TEST_NAME}> # > ${TEST_NAME}.res
+        COMMAND $<TARGET_FILE:${TEST_NAME}>
     )
     
+    # Compare .res file to expected output
     add_test(
         NAME ${TEST_NAME}_check
-        # COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol test-high/${TEST_NAME}.res ${CMAKE_CURRENT_SOURCE_DIR}/expected/${TEST_NAME}.out
         COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol ${TEST_NAME}.res ${CMAKE_CURRENT_SOURCE_DIR}/expected/${TEST_NAME}.out
     )
-
-
 endfunction()
 
-
+create_pcgtest(check-pcg128_once_insecure)
+create_pcgtest(check-pcg128_oneseq_once_insecure)
+create_pcgtest(check-pcg16_once_insecure)
+create_pcgtest(check-pcg16_oneseq_once_insecure)
 create_pcgtest(check-pcg32)
+create_pcgtest(check-pcg32_c1024)
+create_pcgtest(check-pcg32_c1024_fast)
+create_pcgtest(check-pcg32_c64)
+create_pcgtest(check-pcg32_c64_fast)
+create_pcgtest(check-pcg32_c64_oneseq)
+create_pcgtest(check-pcg32_fast)
+create_pcgtest(check-pcg32_k1024)
+create_pcgtest(check-pcg32_k1024_fast)
+create_pcgtest(check-pcg32_k16384)
+create_pcgtest(check-pcg32_k16384_fast)
+create_pcgtest(check-pcg32_k2)
+create_pcgtest(check-pcg32_k2_fast)
+create_pcgtest(check-pcg32_k64)
+create_pcgtest(check-pcg32_k64_fast)
+create_pcgtest(check-pcg32_k64_oneseq)
+create_pcgtest(check-pcg32_once_insecure)
+create_pcgtest(check-pcg32_oneseq)
+create_pcgtest(check-pcg32_oneseq_once_insecure)
+create_pcgtest(check-pcg64)
+create_pcgtest(check-pcg64_c1024)
+create_pcgtest(check-pcg64_c1024_fast)
+create_pcgtest(check-pcg64_c32)
+create_pcgtest(check-pcg64_c32_fast)
+create_pcgtest(check-pcg64_c32_oneseq)
+create_pcgtest(check-pcg64_fast)
+create_pcgtest(check-pcg64_k1024)
+create_pcgtest(check-pcg64_k1024_fast)
+create_pcgtest(check-pcg64_k32)
+create_pcgtest(check-pcg64_k32_fast)
+create_pcgtest(check-pcg64_k32_oneseq)
+create_pcgtest(check-pcg64_once_insecure)
+create_pcgtest(check-pcg64_oneseq)
+create_pcgtest(check-pcg64_oneseq_once_insecure)
+create_pcgtest(check-pcg8_once_insecure)
+create_pcgtest(check-pcg8_oneseq_once_insecure)

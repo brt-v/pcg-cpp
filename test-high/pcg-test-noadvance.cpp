@@ -29,13 +29,13 @@
 #include <cstdlib>
 #include <cassert>
 #include <climits>
-#include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <algorithm>
 #include <numeric>
 #include <random>       // for random_device
 
-#include "pcg_random.hpp"
+#include "pcg/pcg_random.hpp"
 
 // This code can be compiled with the preprocessor symbol RNG set to the
 // PCG generator you'd like to test.
@@ -55,8 +55,13 @@ using pcg_extras::operator<<;
 
 int main(int argc, char** argv)
 {
-    // Read command-line options
+    // Write output to file
+    std::ofstream file("check-" STRINGIFY(RNG) ".res", std::ios::binary);
+    if (!file) {
+        return -1;
+    }
 
+    // Read command-line options
     int rounds = 5;
     bool nondeterministic_seed = false;
 
@@ -95,40 +100,42 @@ int main(int argc, char** argv)
                                 : bits >  32 ? 3
                                 :              how_many_nums;
 
-    cout << STRINGIFY(RNG) << ":\n"
+    file << STRINGIFY(RNG) << ":\n"
     //   << "      -  aka:         " << pcg_extras::printable_typename<RNG>()
     // ^-- we skip this line because the output is long, scary, ugly, and
     //     and varies depending on the platform
          << "      -  result:      " <<  bits << "-bit unsigned int\n"
          << "      -  period:      2^" << RNG::period_pow2();
-    if (RNG::streams_pow2() > 0)
-         cout << "   (* 2^" << RNG::streams_pow2() << " streams)";
-    cout << "\n      -  size:        " << sizeof(RNG) << " bytes\n\n";
+    if (RNG::streams_pow2() > 0) {
+         file << "   (* 2^" << RNG::streams_pow2() << " streams)";
+    }
+    file << "\n      -  size:        " << sizeof(RNG) << " bytes\n\n";
 
     for (int round = 1; round <= rounds; ++round) {
-        printf("Round %d:\n", round);
+        file << "Round " << round << ":\n";
 
         /* Make some N-bit numbers */
-        cout << setw(4) << setfill(' ') << bits << "bit:";
+        file << setw(4) << setfill(' ') << bits << "bit:";
         for (int i = 0; i < how_many_nums; ++i) {
             if (i > 0 && i % wrap_nums_at == 0)
-                cout << "\n\t";
-            cout << " 0x" << hex << setfill('0') 
+                file << "\n\t";
+            file << " 0x" << hex << setfill('0') 
                  << setw(sizeof(RNG::result_type)*2) << rng();
         }
-        cout << dec << endl;
+        file << dec << endl;
 
         /* Toss some coins */
-        cout << "  Coins: ";
-        for (int i = 0; i < 65; ++i)
-            cout << (rng(2) ? "H" : "T");
-        cout << endl;
+        file << "  Coins: ";
+        for (int i = 0; i < 65; ++i) {
+            file << (rng(2) ? "H" : "T");
+        }
+        file << endl;
 
         /* Roll some dice */
-        printf("  Rolls:");
-        for (int i = 0; i < 33; ++i)
-            cout << " " << (uint32_t(rng(6)) + 1);
-        cout << endl;
+        file << "  Rolls:";
+        for (int i = 0; i < 33; ++i) {
+            file << " " << (uint32_t(rng(6)) + 1);
+        }
 
         /* Deal some cards using pcg_extras::shuffle, which follows
          * the algorithm for shuffling that most programmers would expect.
@@ -136,23 +143,24 @@ int main(int argc, char** argv)
          */      
         enum { SUITS = 4, NUMBERS = 13, CARDS = 52 };
         char cards[CARDS];
-        iota(begin(cards), end(cards), 0);
+        std::iota(begin(cards), end(cards), 0);
         pcg_extras::shuffle(begin(cards), end(cards), rng);
 
         /* Output the shuffled deck */
-        printf("  Cards:");
+        file << "  Cards:";
         static const signed char number[] = {'A', '2', '3', '4', '5', '6', '7',
                                              '8', '9', 'T', 'J', 'Q', 'K'};
         static const signed char suit[] =   {'h', 'c', 'd', 's'};
         int i = 0;
         for (auto card : cards) {
             ++i;
-            cout << " " << number[card / SUITS] << suit[card % SUITS];
-            if (i % 22 == 0)
-                cout << "\n\t";
+            file << " " << number[card / SUITS] << suit[card % SUITS];
+            if (i % 22 == 0) {
+                file << "\n\t";
+            }
         }
         
-        cout << "\n" << endl;
+        file << "\n" << endl;
     }
 
     return 0;
