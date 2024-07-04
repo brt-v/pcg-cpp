@@ -14,7 +14,12 @@ target_include_directories(pcg INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(pcg INTERFACE cxx_std_17)
 
 
-# Add samples
 if(PROJECT_IS_TOP_LEVEL)
-  add_subdirectory(sample)
+   # Add samples
+   add_subdirectory(sample)
+
+   # Add tests
+   include(CTest) 
+   enable_testing()
+   add_subdirectory(test-high)
 endif()
