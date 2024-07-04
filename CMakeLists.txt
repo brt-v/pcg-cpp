@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(pcgrandom CXX)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Define library
 add_library(pcg INTERFACE 

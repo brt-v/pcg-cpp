@@ -56,7 +56,7 @@ using pcg_extras::operator<<;
 int main(int argc, char** argv)
 {
     // Write output to file
-    std::ofstream file("check-" STRINGIFY(RNG) ".res", std::ios::binary);
+    std::ofstream file("check-" STRINGIFY(RNG) ".out", std::ios::binary);
     if (!file) {
         return -1;
     }

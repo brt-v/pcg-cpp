@@ -8,14 +8,23 @@ function(create_pcgtest TEST_NAME)
     add_test(
         NAME ${TEST_NAME}_run
         COMMAND $<TARGET_FILE:${TEST_NAME}>
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/actual
     )
     
     # Compare .res file to expected output
     add_test(
         NAME ${TEST_NAME}_check
-        COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol ${TEST_NAME}.res ${CMAKE_CURRENT_SOURCE_DIR}/expected/${TEST_NAME}.out
+        COMMAND ${CMAKE_COMMAND} -E compare_files --ignore-eol ${TEST_NAME}.out ${CMAKE_CURRENT_SOURCE_DIR}/expected/${TEST_NAME}.out
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/actual
     )
+
+    # For Visual Sutio
+    set_target_properties(${TEST_NAME} PROPERTIES FOLDER "test-high")
+
 endfunction()
+
+add_custom_target(create-output-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory actual)
 
 create_pcgtest(check-pcg128_once_insecure)
 create_pcgtest(check-pcg128_oneseq_once_insecure)
