@@ -50,9 +50,10 @@ int main()
     constexpr size_t ROUNDS      = 215 * 1073741824ull / sizeof(buffer);
     
     for (size_t i = 0; i < ROUNDS; ++i) {
-        for (auto& v : buffer)
+        for (auto& v : buffer) {
             v = rng();
-        write(1, (void*) buffer, sizeof(buffer));
+        }
+        (void)write(1, (void*) buffer, sizeof(buffer));
     }
     return 0;
 }

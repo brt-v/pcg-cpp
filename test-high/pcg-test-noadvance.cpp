@@ -33,6 +33,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <numeric>
+#include <climits>
 #include <random>       // for random_device
 
 #include "pcg/pcg_random.hpp"
