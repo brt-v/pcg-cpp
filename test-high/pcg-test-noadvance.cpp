@@ -147,7 +147,7 @@ int main(int argc, char** argv)
         pcg_extras::shuffle(begin(cards), end(cards), rng);
 
         /* Output the shuffled deck */
-        file << "  Cards:";
+        file << "\n  Cards:";
         static const signed char number[] = {'A', '2', '3', '4', '5', '6', '7',
                                              '8', '9', 'T', 'J', 'Q', 'K'};
         static const signed char suit[] =   {'h', 'c', 'd', 's'};
