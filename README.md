@@ -1,3 +1,29 @@
+# About this fork
+
+The PCG random number generators are simply great, but the c++ implementation is a bit outdated and unmaintained. This fork is made with the following goals:
+
+- Convert library and tests to CMake, such that it's easy to use in your projects
+- Convert the tests to CTest, make them run on both Windows and Linux
+- Clean up code
+  - Make sure it compiles with high error levels
+  - Remove unneeded includes
+  - Put everything in namespace `pcg`
+  - Apply some modern (C++17) best practices
+  - Split some parts in separate headers to make the base RNG's a lightweight include
+- Add Github actions, make sure tests run on Linux and Windows
+
+## Examples
+
+### Running tests
+
+```bash
+cmake . -B build
+cmake --build build/ --config Release
+ctest -C Release --test-dir build/
+```
+
+
+
 # PCG Random Number Generation, C++ Edition
 
 [PCG-Random website]: http://www.pcg-random.org
