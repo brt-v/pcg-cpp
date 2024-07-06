@@ -35,10 +35,8 @@
 
 #include <iostream>
 #include <iomanip>
-#include <string>
 #include <map>
 #include <random>
-#include <cmath>
 
 #include "pcg/pcg_random.hpp"
  

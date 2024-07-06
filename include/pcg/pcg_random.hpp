@@ -1,3 +1,4 @@
+#pragma once
 /*
  * PCG Random Number Generation for C++
  *
@@ -70,23 +71,11 @@
  *
  */
 
-#ifndef PCG_RAND_HPP_INCLUDED
-#define PCG_RAND_HPP_INCLUDED 1
-
-#include <algorithm>
-#include <cinttypes>
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
+#include <cstdint>
 #include <cassert>
-#include <limits>
 #include <iostream>
-#include <iterator>
 #include <type_traits>
-#include <utility>
-#include <locale>
-#include <new>
-#include <stdexcept>
+
 
 #ifdef _MSC_VER
     #pragma warning(disable:4146)
@@ -1947,5 +1936,3 @@ typedef pcg_engines::ext_oneseq_xsh_rs_64_32<14,32,true>    pcg32_k16384_fast;
 #ifdef _MSC_VER
     #pragma warning(default:4146)
 #endif
-
-#endif // PCG_RAND_HPP_INCLUDED

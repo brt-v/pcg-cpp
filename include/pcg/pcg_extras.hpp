@@ -1,3 +1,4 @@
+#pragma once
 /*
  * PCG Random Number Generation for C++
  *
@@ -30,20 +31,11 @@
  *        bound
  */
 
-#ifndef PCG_EXTRAS_HPP_INCLUDED
-#define PCG_EXTRAS_HPP_INCLUDED 1
-
-#include <cinttypes>
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
+#include <cstdint>
 #include <cassert>
 #include <limits>
 #include <iostream>
 #include <type_traits>
-#include <utility>
-#include <locale>
-#include <iterator>
 
 #ifdef __GNUC__
     #include <cxxabi.h>
@@ -662,5 +654,3 @@ std::ostream& operator<<(std::ostream& out, printable_typename<T>) {
 #endif  // __cpp_rtti || __GXX_RTTI
 
 } // namespace pcg_extras
-
-#endif // PCG_EXTRAS_HPP_INCLUDED

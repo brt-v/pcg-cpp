@@ -1,3 +1,6 @@
+add_executable(basic_usage basic_usage.cpp)
+target_link_libraries(basic_usage PUBLIC pcg::pcg)
+
 add_executable(codebook codebook.cpp)
 target_link_libraries(codebook PUBLIC pcg::pcg)
 
