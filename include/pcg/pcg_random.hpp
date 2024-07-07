@@ -74,8 +74,6 @@
 #include <cstdint>
 #include <cassert>
 #include <iostream>
-#include <type_traits>
-
 
 #ifdef _MSC_VER
     #pragma warning(disable:4146)
@@ -365,8 +363,7 @@ template <typename xtype, typename itype,
           typename stream_mixin = oneseq_stream<itype>,
           typename multiplier_mixin = default_multiplier<itype> >
 class engine : protected output_mixin,
-               public stream_mixin,
-               protected multiplier_mixin {
+               public stream_mixin {
 protected:
     itype state_;
 
@@ -374,11 +371,11 @@ protected:
     struct no_specifiable_stream_tag {};
 
     using stream_mixin::increment;
-    using multiplier_mixin::multiplier;
 
 public:
-    typedef xtype result_type;
-    typedef itype state_type;
+    static constexpr itype Multiplier = multiplier_mixin::multiplier();
+    using result_type = xtype;
+    using state_type  = itype;
 
     static constexpr size_t period_pow2()
     {
@@ -401,7 +398,7 @@ public:
 protected:
     itype bump(itype state)
     {
-        return state * multiplier() + increment();
+        return state * Multiplier + increment();
     }
 
     itype base_generate()
@@ -439,13 +436,13 @@ protected:
 
     itype distance(itype newstate, itype mask = itype(~itype(0U))) const
     {
-        return distance(state_, newstate, multiplier(), increment(), mask);
+        return distance(state_, newstate, Multiplier, increment(), mask);
     }
 
 public:
     void advance(itype delta)
     {
-        state_ = advance(state_, delta, this->multiplier(), this->increment());
+        state_ = advance(state_, delta, Multiplier, this->increment());
     }
 
     void backstep(itype delta)
@@ -578,7 +575,7 @@ operator<<(std::basic_ostream<CharT,Traits>& out,
     auto space = out.widen(' ');
     auto orig_fill = out.fill();
 
-    out << rng.multiplier() << space
+    out << rng.Multiplier << space
         << rng.increment() << space
         << rng.state_;
 
@@ -607,7 +604,7 @@ operator>>(std::basic_istream<CharT,Traits>& in,
 
     if (!in.fail()) {
         bool good = true;
-        if (multiplier != rng.multiplier()) {
+        if (multiplier != rng.Multiplier) {
            good = false;
         } else if (rng.can_specify_stream) {
            rng.set_stream(increment >> 1);
@@ -700,12 +697,12 @@ itype operator-(const engine<xtype,itype,
        return rhs.distance(lhs.state_);
     } else  {
        constexpr itype ONE = 1u;
-       itype lhs_diff = lhs.increment() + (lhs.multiplier()-ONE) * lhs.state_;
-       itype rhs_diff = rhs.increment() + (rhs.multiplier()-ONE) * rhs.state_;
+       itype lhs_diff = lhs.increment() + (lhs.Multiplier - ONE) * lhs.state_;
+       itype rhs_diff = rhs.increment() + (rhs.Multiplier - ONE) * rhs.state_;
        if ((lhs_diff & itype(3u)) != (rhs_diff & itype(3u))) {
            rhs_diff = -rhs_diff;
        }
-       return rhs.distance(rhs_diff, lhs_diff, rhs.multiplier(), itype(0u));
+       return rhs.distance(rhs_diff, lhs_diff, rhs.Multiplier, itype(0u));
     }
 }
 
@@ -721,7 +718,7 @@ bool operator==(const engine<xtype,itype,
                                output_mixin,output_previous,
                                stream_mixin_rhs, multiplier_mixin_rhs>& rhs)
 {
-    return    (lhs.multiplier() == rhs.multiplier())
+    return    (lhs.Multiplier == rhs.Multiplier)
            && (lhs.increment()  == rhs.increment())
            && (lhs.state_       == rhs.state_);
 }
@@ -933,7 +930,7 @@ PCG_DEFINE_CONSTANT(pcg128_t, mcg, unmultiplier,
 
 template <typename xtype, typename itype>
 struct rxs_m_xs_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
@@ -953,7 +950,7 @@ struct rxs_m_xs_mixin {
         return result;
     }
 
-    static itype unoutput(itype internal)
+    static constexpr itype unoutput(itype internal)
     {
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
         constexpr bitcount_t opbits = bits >= 128 ? 6
@@ -981,7 +978,7 @@ struct rxs_m_xs_mixin {
 
 template <typename xtype, typename itype>
 struct rxs_m_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
@@ -1019,7 +1016,7 @@ struct rxs_m_mixin {
 
 template <typename xtype, typename itype>
 struct dxsm_mixin {
-    inline xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t itypebits = bitcount_t(sizeof(itype) * 8);
@@ -1047,7 +1044,7 @@ struct dxsm_mixin {
 
 template <typename xtype, typename itype>
 struct xsl_rr_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
@@ -1093,7 +1090,7 @@ template <typename xtype, typename itype>
 struct xsl_rr_rr_mixin {
     typedef typename halfsize_trait<itype>::type htype;
 
-    static itype output(itype internal)
+    static constexpr itype output(itype internal)
     {
         constexpr bitcount_t htypebits = bitcount_t(sizeof(htype) * 8);
         constexpr bitcount_t bits      = bitcount_t(sizeof(itype) * 8);
@@ -1133,7 +1130,7 @@ struct xsl_rr_rr_mixin {
 
 template <typename xtype, typename itype>
 struct xsh_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
@@ -1156,7 +1153,7 @@ struct xsh_mixin {
 
 template <typename xtype, typename itype>
 struct xsl_mixin {
-    inline xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t xtypebits = bitcount_t(sizeof(xtype) * 8);
         constexpr bitcount_t bits = bitcount_t(sizeof(itype) * 8);
@@ -1184,10 +1181,10 @@ struct inside_out : private baseclass {
     static_assert(sizeof(result_type) == sizeof(state_type),
                   "Require a RNG whose output function is a permutation");
 
-    static bool external_step(result_type& randval, size_t i)
+    static constexpr bool external_step(result_type& randval, size_t i)
     {
         state_type state = baseclass::unoutput(randval);
-        state = state * baseclass::multiplier() + baseclass::increment()
+        state = state * baseclass::Multiplier + baseclass::increment()
                 + state_type(i*2);
         result_type result = baseclass::output(state);
         randval = result;
@@ -1196,11 +1193,11 @@ struct inside_out : private baseclass {
         return result == zero;
     }
 
-    static bool external_advance(result_type& randval, size_t i,
+    static constexpr bool external_advance(result_type& randval, size_t i,
                                  result_type delta, bool forwards = true)
     {
         state_type state = baseclass::unoutput(randval);
-        state_type mult  = baseclass::multiplier();
+        state_type mult  = baseclass::Multiplier;
         state_type inc   = baseclass::increment() + state_type(i*2);
         state_type zero =
             baseclass::is_mcg ? state & state_type(3U) : state_type(0U);
@@ -1471,7 +1468,7 @@ operator<<(std::basic_ostream<CharT,Traits>& out,
     auto space = out.widen(' ');
     auto orig_fill = out.fill();
 
-    out << rng.multiplier() << space
+    out << rng.Multiplier << space
         << rng.increment() << space
         << rng.state_;
 
