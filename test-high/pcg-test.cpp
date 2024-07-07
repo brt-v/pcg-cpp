@@ -24,16 +24,14 @@
  * It shows some basic generation tasks.
  */
 
-#include <cstddef>
 #include <cstdint>
-#include <cstdlib>
-#include <cassert>
 #include <fstream>
 #include <iomanip>
-#include <algorithm>
+#include <algorithm>    // for std::shuffle
 #include <numeric>
-#include <climits>
+#include <climits>      // for CHAR_BIT
 #include <random>       // for random_device
+#include <string.h>     // for strcmp
 
 #include "pcg/pcg_random.hpp"
 

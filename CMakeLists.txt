@@ -16,6 +16,13 @@ target_compile_features(pcg INTERFACE cxx_std_17)
 
 
 if(PROJECT_IS_TOP_LEVEL)
+   # Compiler warnings
+   if (MSVC)
+      add_compile_options(/W3 /WX)
+   else()
+      add_compile_options(-Wall -Wextra -pedantic -Werror)
+   endif()
+
    # Add samples
    add_subdirectory(sample)
 
