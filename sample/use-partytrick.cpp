@@ -59,17 +59,19 @@ int main()
     std::istringstream inbuf(saved_state);
     inbuf >> rng;
     std::clog << inbuf.str() << "\n\n";
-    if (inbuf.fail())
+    if (inbuf.fail()) {
         abort();
+    }
 
     constexpr size_t BUFFER_SIZE = 1024ull * 128ull;
     uint32_t buffer[BUFFER_SIZE];
     constexpr size_t ROUNDS      = 215 * 1073741824ull / sizeof(buffer);
     
     for (size_t i = 0; i < ROUNDS; ++i) {
-        for (auto& v : buffer)
+        for (auto& v : buffer) {
             v = rng();
-        write(1, (void*) buffer, sizeof(buffer));
+        }
+        //(void)_write(1, (void*) buffer, sizeof(buffer));
     }
 
     return 0;

@@ -26,10 +26,14 @@
 
 #include <iostream>
 #include <iomanip>
-#include <numeric>
 #include <random>       // for random_device
+#include <string.h>     // for strcmp
+#include <climits>      // for CHAR_BIT
+#include <algorithm>    // for std::shuffle
+#include <numeric>      // for std::iota
 
 #include "pcg/pcg_random.hpp"
+
 
 // This code can be compiled with the preprocessor symbol RNG set to the
 // PCG generator you'd like to test.
@@ -143,16 +147,16 @@ int main(int argc, char** argv)
         rng_copy = rng;
         enum { SUITS = 4, NUMBERS = 13, CARDS = 52 };
         char cards[CARDS];
-        iota(begin(cards), end(cards), 0);
-        std::shuffle(begin(cards), end(cards), rng);
+        std::iota(std::begin(cards), std::end(cards), 0);
+        std::shuffle(std::begin(cards), std::end(cards), rng);
         auto std_shuffle_steps = rng - rng_copy;
         
         /* Restore RNG and deal again using pcg_extras::shuffle, which follows
          * the algorithm for shuffling that most programmers would expect.
          */      
         rng = rng_copy;
-        iota(begin(cards), end(cards), 0);
-        pcg_extras::shuffle(begin(cards), end(cards), rng);
+        std::iota(std::begin(cards), std::end(cards), 0);
+        pcg_extras::shuffle(std::begin(cards), std::end(cards), rng);
         auto my_shuffle_steps = rng - rng_copy;
 
         /* Output the shuffled deck */

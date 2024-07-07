@@ -53,7 +53,7 @@ int main()
         for (auto& v : buffer) {
             v = rng();
         }
-        (void)write(1, (void*) buffer, sizeof(buffer));
+        //(void)write(1, (void*) buffer, sizeof(buffer));
     }
     return 0;
 }
