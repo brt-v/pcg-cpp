@@ -37,12 +37,6 @@
 #define PCG_UINT128_HPP_INCLUDED 1
 
 #include <cstdint>
-#include <cstdio>
-#include <cassert>
-#include <climits>
-#include <utility>
-#include <initializer_list>
-#include <type_traits>
 
 #if defined(_MSC_VER)  // Use MSVC++ intrinsics
 #include <intrin.h>

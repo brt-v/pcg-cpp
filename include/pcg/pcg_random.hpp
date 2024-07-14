@@ -193,15 +193,8 @@ template <typename itype>
 class unique_stream {
 protected:
     static constexpr bool is_mcg = false;
-
-    // Is never called, but is provided for symmetry with specific_stream
-    void set_stream(...)
-    {
-        abort();
-    }
-
 public:
-    typedef itype state_type;
+    using state_type = itype;
 
     constexpr itype increment() const {
         return itype(reinterpret_cast<uintptr_t>(this) | 1);
@@ -233,13 +226,6 @@ template <typename itype>
 class no_stream {
 protected:
     static constexpr bool is_mcg = true;
-
-    // Is never called, but is provided for symmetry with specific_stream
-    void set_stream(...)
-    {
-        abort();
-    }
-
 public:
     typedef itype state_type;
 
@@ -253,9 +239,6 @@ public:
     {
         return 0u;
     }
-
-protected:
-    constexpr no_stream() = default;
 };
 
 
@@ -267,15 +250,8 @@ template <typename itype>
 class oneseq_stream : public default_increment<itype> {
 protected:
     static constexpr bool is_mcg = false;
-
-    // Is never called, but is provided for symmetry with specific_stream
-    void set_stream(...)
-    {
-        abort();
-    }
-
 public:
-    typedef itype state_type;
+    using state_type = itype;
 
     static constexpr itype stream()
     {
@@ -288,9 +264,6 @@ public:
     {
         return 0u;
     }
-
-protected:
-    constexpr oneseq_stream() = default;
 };
 
 
@@ -306,14 +279,14 @@ protected:
     itype inc_ = default_increment<itype>::increment();
 
 public:
-    typedef itype state_type;
-    typedef itype stream_state;
+    using state_type   = itype;
+    using stream_state = itype;
 
     constexpr itype increment() const {
         return inc_;
     }
 
-    itype stream()
+    constexpr  itype stream() const
     {
          return inc_ >> 1;
     }
@@ -414,15 +387,15 @@ protected:
     }
 
 public:
-    result_type operator()()
+    PCG_ALWAYS_INLINE result_type operator()()
     {
-        if (output_previous)
-            return this->output(base_generate0());
+        if constexpr (output_previous)
+            return output_mixin::output(base_generate0());
         else
-            return this->output(base_generate());
+            return output_mixin::output(base_generate());
     }
 
-    result_type operator()(result_type upper_bound)
+    PCG_ALWAYS_INLINE result_type operator()(result_type upper_bound)
     {
         return bounded_rand(*this, upper_bound);
     }
@@ -457,7 +430,7 @@ public:
 
     bool wrapped()
     {
-        if (stream_mixin::is_mcg) {
+        if constexpr (stream_mixin::is_mcg) {
             // For MCGs, the low order two bits never change. In this
             // implementation, we keep them fixed at 3 to make this test
             // easier.
@@ -796,7 +769,7 @@ using mcg_base = engine<xtype, itype,
 
 template <typename xtype, typename itype>
 struct xsh_rs_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t bits        = bitcount_t(sizeof(itype) * 8);
         constexpr bitcount_t xtypebits   = bitcount_t(sizeof(xtype) * 8);
@@ -829,7 +802,7 @@ struct xsh_rs_mixin {
 
 template <typename xtype, typename itype>
 struct xsh_rr_mixin {
-    static xtype output(itype internal)
+    static constexpr xtype output(itype internal)
     {
         constexpr bitcount_t bits        = bitcount_t(sizeof(itype) * 8);
         constexpr bitcount_t xtypebits   = bitcount_t(sizeof(xtype)*8);
@@ -864,7 +837,7 @@ struct xsh_rr_mixin {
 
 template <typename xtype, typename itype>
 struct rxs_mixin {
-static xtype output_rxs(itype internal)
+    static xtype output_rxs(itype internal)
     {
         constexpr bitcount_t bits        = bitcount_t(sizeof(itype) * 8);
         constexpr bitcount_t xtypebits   = bitcount_t(sizeof(xtype)*8);
@@ -1252,20 +1225,20 @@ private:
     result_type& get_extended_value()
     {
         state_type state = this->state_;
-        if (kdd && baseclass::is_mcg) {
+        if constexpr (kdd && baseclass::is_mcg) {
             // The low order bits of an MCG are constant, so drop them.
             state >>= 2;
         }
         size_t index       = kdd ? state &  table_mask
                                  : state >> table_shift;
 
-        if (may_tick) {
+        if constexpr (may_tick) {
             bool tick = kdd ? (state & tick_mask) == state_type(0u)
                             : (state >> tick_shift) == state_type(0u);
             if (tick)
                     advance_table();
         }
-        if (may_tock) {
+        if constexpr (may_tock) {
             bool tock = state == state_type(0u);
             if (tock)
                 advance_table();
@@ -1546,7 +1519,7 @@ extended<table_pow2,advance_pow2,baseclass,extvalclass,kdd>::advance_table(
     for (size_t i = 0; i < table_size; ++i) {
         base_state_t total_delta = carry + delta;
         ext_state_t  trunc_delta = ext_state_t(total_delta);
-        if (basebits > extbits) {
+        if constexpr (basebits > extbits) {
             carry = total_delta >> extbits;
         } else {
             carry = 0;
@@ -1566,7 +1539,7 @@ void extended<table_pow2,advance_pow2,baseclass,extvalclass,kdd>::advance(
         "For a weak advance, cast to base class");
     state_type zero =
         baseclass::is_mcg ? this->state_ & state_type(3U) : state_type(0U);
-    if (may_tick) {
+    if constexpr (may_tick) {
         state_type ticks = distance >> (advance_pow2*may_tick);
                                         // ^-- stupidity to appease GCC
                                         // warnings
