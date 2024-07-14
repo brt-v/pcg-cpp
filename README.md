@@ -1,29 +1,3 @@
-# About this fork
-
-The PCG random number generators are simply great, but the c++ implementation is a bit outdated and unmaintained. This fork is made with the following goals:
-
-- Convert library and tests to CMake, such that it's easy to use in your projects
-- Convert the tests to CTest, make them run on both Windows and Linux
-- Clean up code
-  - Make sure it compiles with high error levels
-  - Remove unneeded includes
-  - Put everything in namespace `pcg`
-  - Apply some modern (C++17) best practices
-  - Split some parts in separate headers to make the base RNG's a lightweight include
-- Add Github actions, make sure tests run on Linux and Windows
-
-## Examples
-
-### Running tests
-
-```bash
-cmake . -B build
-cmake --build build/ --config Release
-ctest -C Release --test-dir build/
-```
-
-
-
 # PCG Random Number Generation, C++ Edition
 
 [PCG-Random website]: http://www.pcg-random.org
@@ -50,29 +24,82 @@ Visit [PCG-Random website] for information on how to use this library, or look
 at the sample code in the `sample` directory -- hopefully it should be fairly
 self explanatory.
 
-## Building
+## Examples
 
-The code is written in C++11, as an include-only library (i.e., there is
-nothing you need to build).  There are some provided demo programs and tests
-however.  On a Unix-style system (e.g., Linux, Mac OS X) you should be able
-to just type
+### How to use this library in a project
 
-    make
+Example `main.cpp`:
+```cpp
+#include "pcg/pcg_random.hpp"
 
-To build the demo programs.
+int main()
+{
+    pcg32 rng(42);
+    return rng();
+}
+```
 
-## Testing
+And `CMakeLists.txt`:
+```bash
+cmake_minimum_required(VERSION 3.21)
 
-Run
+project(UsePCG LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
 
-    make test
+include(FetchContent)
+FetchContent_Declare( pcg-cpp
+    GIT_REPOSITORY https://github.com/brt-v/pcg-cpp.git
+    GIT_TAG master
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(pcg-cpp)
+
+add_executable(UsePCG main.cpp)
+target_link_libraries(UsePCG pcg::pcg)
+
+# Select right project in VS Solution
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT UsePCG)
+```
+Then run:
+```bash
+cmake . -B build
+cmake --build build/
+```
+
+### Running tests
+
+Pull this repository, then:
+```bash
+cmake . -B build
+cmake --build build/ --config Release
+ctest -C Release --test-dir build/
+```
+
 
 ## Directory Structure
 
 The directories are arranged as follows:
 
-* `include` -- contains `pcg_random.hpp` and supporting include files
+* `include` -- contains `pcg/pcg_random.hpp` and supporting include files
 * `test-high` -- test code for the high-level API where the functions have
   shorter, less scary-looking names.
 * `sample` -- sample code, some similar to the code in `test-high` but more 
   human readable, some other examples too
+
+# About this fork
+
+The PCG random number generators are great, but the C++ implementation is a bit outdated and unmaintained. This fork is made with the following goals:
+
+- [x] Convert library and tests to CMake, such that it's easy to use in your projects
+- [x] Convert the tests to CTest, make them run on Linux
+  - [ ] and Windows (some tests fails. Output is identical, but object size are different, I suspect due to EBO)
+- Clean up code
+  - [x] Make sure it compiles with high error levels
+  - [x] Remove unneeded includes
+  - [ ] Put everything in namespace `pcg`
+  - [x] Apply some modern (C++17) best practices
+  - [ ] Split some parts in separate headers to make the base RNG's a lightweight include
+- [ ] Add Github actions, make sure tests run on Linux and Windows
+- [ ] Check with static analysis 
+- [ ] Add clang format
+
