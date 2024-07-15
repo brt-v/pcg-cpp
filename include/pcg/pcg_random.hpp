@@ -247,11 +247,15 @@ public:
  */
 
 template <typename itype>
-class oneseq_stream : public default_increment<itype> {
+class oneseq_stream {
 protected:
     static constexpr bool is_mcg = false;
 public:
     using state_type = itype;
+
+	static constexpr itype increment() {
+        return default_increment<itype>::increment();
+	}
 
     static constexpr itype stream()
     {
