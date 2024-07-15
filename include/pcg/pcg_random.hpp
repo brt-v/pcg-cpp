@@ -335,12 +335,11 @@ protected:
  */
 
 template <typename xtype, typename itype,
-          typename output_mixin,
+          typename output_mixin_type,
           bool output_previous = true,
           typename stream_mixin = oneseq_stream<itype>,
           typename multiplier_mixin = default_multiplier<itype> >
-class engine : protected output_mixin,
-               public stream_mixin {
+class engine : public stream_mixin {
 protected:
     itype state_;
 
@@ -348,7 +347,7 @@ protected:
     struct no_specifiable_stream_tag {};
 
     using stream_mixin::increment;
-
+    using output_mixin = output_mixin_type;
 public:
     static constexpr itype Multiplier = multiplier_mixin::multiplier();
     using result_type = xtype;
@@ -1160,10 +1159,10 @@ struct inside_out : private baseclass {
 
     static constexpr bool external_step(result_type& randval, size_t i)
     {
-        state_type state = baseclass::unoutput(randval);
+        state_type state = baseclass::output_mixin::unoutput(randval);
         state = state * baseclass::Multiplier + baseclass::increment()
                 + state_type(i*2);
-        result_type result = baseclass::output(state);
+        result_type result = baseclass::output_mixin::output(state);
         randval = result;
         state_type zero =
             baseclass::is_mcg ? state & state_type(3U) : state_type(0U);
@@ -1173,7 +1172,7 @@ struct inside_out : private baseclass {
     static constexpr bool external_advance(result_type& randval, size_t i,
                                  result_type delta, bool forwards = true)
     {
-        state_type state = baseclass::unoutput(randval);
+        state_type state = baseclass::output_mixin::unoutput(randval);
         state_type mult  = baseclass::Multiplier;
         state_type inc   = baseclass::increment() + state_type(i*2);
         state_type zero =
@@ -1185,7 +1184,7 @@ struct inside_out : private baseclass {
         if (!forwards)
             delta = -delta;
         state = baseclass::advance(state, delta, mult, inc);
-        randval = baseclass::output(state);
+        randval = baseclass::output_mixin::output(state);
         return crosses_zero;
     }
 };
