@@ -49,8 +49,6 @@
 using namespace std;
 using pcg_extras::operator<<;
 
-#if !PCG_EMULATED_128BIT_MATH || !AWKWARD_128BIT_CODE
-
 int main(int argc, char** argv)
 {
     // Write output to file
@@ -164,14 +162,3 @@ int main(int argc, char** argv)
     return 0;
 }
 
-#else //  i.e. PCG_EMULATED_128BIT_MATH && AWKWARD_128BIT_CODE
-
-int main()
-{
-    // It's not that it *can't* be done, it just requires either C++14-style
-    // constexpr or some things not to be declared const.
-    cout << "Sorry, " STRINGIFY(RNG) " not supported with emulated 128-bit math"
-         << endl;
-}
-
-#endif
