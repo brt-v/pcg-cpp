@@ -69,11 +69,15 @@ namespace pcg_extras {
     }
     #define PCG_128BIT_CONSTANT(high,low) \
             ((pcg_extras::pcg128_t(high) << 64) + low)
+#elif __has_include(<__msvc_int128.hpp>)
+    #include <__msvc_int128.hpp>
+    namespace pcg_extras {
+		using pcg128_t = std::_Unsigned128;
+    }
+    #define PCG_128BIT_CONSTANT(high,low) \
+            pcg_extras::pcg128_t(low, high)
 #else
     #include "pcg_uint128.hpp"
-    namespace pcg_extras {
-        using pcg128_t = pcg_extras::uint_x4<uint32_t,uint64_t>;
-    }
     #define PCG_128BIT_CONSTANT(high,low) \
             pcg_extras::pcg128_t(high,low)
     #define PCG_EMULATED_128BIT_MATH 1

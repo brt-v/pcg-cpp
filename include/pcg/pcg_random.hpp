@@ -1193,9 +1193,9 @@ struct inside_out : private baseclass {
 template <bitcount_t table_pow2, bitcount_t advance_pow2, typename baseclass, typename extvalclass, bool kdd = true>
 class extended : public baseclass {
 public:
-    typedef typename baseclass::state_type  state_type;
-    typedef typename baseclass::result_type result_type;
-    typedef inside_out<extvalclass> insideout;
+    using state_type = typename baseclass::state_type ;
+    using result_type = typename baseclass::result_type;
+    using insideout = inside_out<extvalclass>;
 
 private:
     static constexpr bitcount_t rtypebits = sizeof(result_type)*8;
@@ -1232,8 +1232,8 @@ private:
             // The low order bits of an MCG are constant, so drop them.
             state >>= 2;
         }
-        size_t index       = kdd ? state &  table_mask
-                                 : state >> table_shift;
+        size_t index       = kdd ? size_t(state &  table_mask)
+                                 : size_t(state >> table_shift);
 
         if constexpr (may_tick) {
             bool tick = kdd ? (state & tick_mask) == state_type(0u)
