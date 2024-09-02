@@ -227,7 +227,7 @@ class no_stream {
 protected:
     static constexpr bool is_mcg = true;
 public:
-    typedef itype state_type;
+    using result_type = itype;
 
     static constexpr itype increment() {
         return 0;
@@ -463,25 +463,25 @@ public:
     }
 
     template<typename SeedSeq>
-    engine(SeedSeq&& seedSeq, typename std::enable_if<
+    engine(SeedSeq& seedSeq, typename std::enable_if<
                   !stream_mixin::can_specify_stream
                && !std::is_convertible<SeedSeq, itype>::value
                && !std::is_convertible<SeedSeq, engine>::value,
                no_specifiable_stream_tag>::type = {})
-        : engine(generate_one<itype>(std::forward<SeedSeq>(seedSeq)))
+        : engine(generate_one<itype>(seedSeq))
     {
         // Nothing else to do.
     }
 
     template<typename SeedSeq>
-    engine(SeedSeq&& seedSeq, typename std::enable_if<
+    engine(SeedSeq& seedSeq, typename std::enable_if<
                    stream_mixin::can_specify_stream
                && !std::is_convertible<SeedSeq, itype>::value
                && !std::is_convertible<SeedSeq, engine>::value,
         can_specify_stream_tag>::type = {})
     {
         itype seeddata[2];
-        generate_to<2>(std::forward<SeedSeq>(seedSeq), seeddata);
+        generate_to<2>(seedSeq, seeddata);
         seed(seeddata[1], seeddata[0]);
     }
 
@@ -638,7 +638,7 @@ itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
     itype cur_state, itype newstate, itype cur_mult, itype cur_plus, itype mask)
 {
     constexpr itype ONE  = 1u;  // itype could be weird, so use constant
-    bool is_mcg = cur_plus == itype(0);
+    const bool is_mcg = cur_plus == itype(0);
     itype the_bit = is_mcg ? itype(4u) : itype(1u);
     itype distance = 0u;
     while ((cur_state & mask) != (newstate & mask)) {
@@ -824,9 +824,9 @@ struct xsh_rr_mixin {
         constexpr bitcount_t topspare    = opbits;
         constexpr bitcount_t bottomspare = sparebits - topspare;
         constexpr bitcount_t xshift      = (topspare + xtypebits)/2;
-        bitcount_t rot = opbits ? bitcount_t(internal >> (bits - opbits)) & mask
+        const bitcount_t rot = opbits ? bitcount_t(internal >> (bits - opbits)) & mask
                                 : 0;
-        bitcount_t amprot = (rot << amplifier) & mask;
+        const bitcount_t amprot = (rot << amplifier) & mask;
         internal ^= internal >> xshift;
         xtype result = xtype(internal >> bottomspare);
         result = rotr(result, amprot);
@@ -1057,10 +1057,10 @@ struct xsl_rr_mixin {
  */
 
 template <typename T> struct halfsize_trait {};
-template <> struct halfsize_trait<pcg128_t>  { typedef uint64_t type; };
-template <> struct halfsize_trait<uint64_t>  { typedef uint32_t type; };
-template <> struct halfsize_trait<uint32_t>  { typedef uint16_t type; };
-template <> struct halfsize_trait<uint16_t>  { typedef uint8_t type;  };
+template <> struct halfsize_trait<pcg128_t>  { using type = uint64_t; };
+template <> struct halfsize_trait<uint64_t>  { using type = uint32_t; };
+template <> struct halfsize_trait<uint32_t>  { using type = uint16_t; };
+template <> struct halfsize_trait<uint16_t>  { using type = uint8_t;  };
 
 template <typename xtype, typename itype>
 struct xsl_rr_rr_mixin {
@@ -1152,8 +1152,8 @@ template <typename baseclass>
 struct inside_out : private baseclass {
     inside_out() = delete;
 
-    typedef typename baseclass::result_type result_type;
-    typedef typename baseclass::state_type  state_type;
+    using result_type = typename baseclass::result_type;
+    using state_type = typename baseclass::state_type;
     static_assert(sizeof(result_type) == sizeof(state_type),
                   "Require a RNG whose output function is a permutation");
 
@@ -1335,7 +1335,7 @@ public:
     template<typename SeedSeq, typename = typename std::enable_if<
            !std::is_convertible<SeedSeq, result_type>::value
         && !std::is_convertible<SeedSeq, extended>::value>::type>
-    extended(SeedSeq&& seedSeq)
+    extended(SeedSeq& seedSeq)
         : baseclass(seedSeq)
     {
         generate_to<table_size>(seedSeq, data_);

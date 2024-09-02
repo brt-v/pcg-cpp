@@ -472,14 +472,14 @@ inline SrcIter uneven_copy(SrcIter src_first,
  */
 
 template <size_t size, typename SeedSeq, typename DestIter>
-inline void generate_to_impl(SeedSeq&& generator, DestIter dest,
+inline void generate_to_impl(SeedSeq& generator, DestIter dest,
                              std::true_type)
 {
     generator.generate(dest, dest+size);
 }
 
 template <size_t size, typename SeedSeq, typename DestIter>
-void generate_to_impl(SeedSeq&& generator, DestIter dest,
+void generate_to_impl(SeedSeq& generator, DestIter dest,
                       std::false_type)
 {
     using dest_t = typename std::iterator_traits<DestIter>::value_type;
@@ -508,12 +508,12 @@ void generate_to_impl(SeedSeq&& generator, DestIter dest,
 }
 
 template <size_t size, typename SeedSeq, typename DestIter>
-inline void generate_to(SeedSeq&& generator, DestIter dest)
+inline void generate_to(SeedSeq& generator, DestIter dest)
 {
     using dest_t = typename std::iterator_traits<DestIter>::value_type;
     constexpr bool IS_32BIT = sizeof(dest_t) == sizeof(uint32_t);
 
-    generate_to_impl<size>(std::forward<SeedSeq>(generator), dest,
+    generate_to_impl<size>(generator, dest,
                            std::integral_constant<bool, IS_32BIT>{});
 }
 
@@ -523,10 +523,10 @@ inline void generate_to(SeedSeq&& generator, DestIter dest)
  */
 
 template <typename UInt, size_t i = 0UL, size_t N = i+1UL, typename SeedSeq>
-inline UInt generate_one(SeedSeq&& generator)
+inline UInt generate_one(SeedSeq& generator)
 {
     UInt result[N];
-    generate_to<N>(std::forward<SeedSeq>(generator), result);
+    generate_to<N>(generator, result);
     return result[i];
 }
 
@@ -535,23 +535,23 @@ auto bounded_rand(RngType& rng, typename RngType::result_type upper_bound)
         -> typename RngType::result_type
 {
     using rtype = typename RngType::result_type;
-    rtype threshold = (RngType::max() - RngType::min() + rtype(1) - upper_bound)
+    const rtype threshold = (RngType::max() - RngType::min() + rtype(1) - upper_bound)
                     % upper_bound;
     for (;;) {
-        rtype r = rng() - RngType::min();
+        const rtype r = rng() - RngType::min();
         if (r >= threshold)
             return r % upper_bound;
     }
 }
 
 template <typename Iter, typename RandType>
-void shuffle(Iter from, Iter to, RandType&& rng)
+void shuffle(Iter from, Iter to, RandType& rng)
 {
     using delta_t  = typename std::iterator_traits<Iter>::difference_type;
     using result_t = typename std::remove_reference<RandType>::type::result_type;
     auto count = to - from;
     while (count > 1) {
-        delta_t chosen = delta_t(bounded_rand(rng, result_t(count)));
+        const delta_t chosen = delta_t(bounded_rand(rng, result_t(count)));
         --count;
         --to;
         using std::swap;
@@ -576,7 +576,7 @@ class seed_seq_from {
 private:
     RngType rng_;
 
-    typedef uint_least32_t result_type;
+    using result_type = uint_least32_t;
 
 public:
     template<typename... Args>
