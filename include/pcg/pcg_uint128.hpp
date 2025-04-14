@@ -1,3 +1,4 @@
+#pragma once
 /*
  * PCG Random Number Generation for C++
  *
@@ -33,8 +34,6 @@
  * than hand-coded assembly or direct CPU support.
  */
 
-#ifndef PCG_UINT128_HPP_INCLUDED
-#define PCG_UINT128_HPP_INCLUDED 1
 
 #include <cstdint>
 
@@ -997,4 +996,3 @@ uint_x4<UInt32,uint64_t> operator>>(const uint_x4<UInt32,uint64_t>& v,
 
 } // namespace pcg_extras
 
-#endif // PCG_UINT128_HPP_INCLUDED

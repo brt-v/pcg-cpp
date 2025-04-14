@@ -33,6 +33,7 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <iostream>
 
 #ifdef __GNUC__
     #include <cxxabi.h>
