@@ -73,17 +73,10 @@
 
 #include <cstdint>
 #include <cassert>
+#include <iosfwd>
 
 #ifdef _MSC_VER
     #pragma warning(disable:4146)
-#endif
-
-#ifdef _MSC_VER
-    #define PCG_ALWAYS_INLINE __forceinline
-#elif __GNUC__
-    #define PCG_ALWAYS_INLINE __attribute__((always_inline))
-#else
-    #define PCG_ALWAYS_INLINE inline
 #endif
 
 /*
@@ -97,7 +90,8 @@
  *        bound
  */
 
-#include "pcg_extras.hpp"
+#include "pcg_core.hpp"
+
 
 namespace pcg_detail {
 
@@ -544,7 +538,6 @@ operator<<(std::basic_ostream<CharT,Traits>& out,
                           output_mixin,output_previous,
                           stream_mixin, multiplier_mixin>& rng)
 {
-    using pcg_extras::operator<<;
 
     auto orig_flags = out.flags(std::ios_base::dec | std::ios_base::left);
     auto space = out.widen(' ');
@@ -570,7 +563,6 @@ operator>>(std::basic_istream<CharT,Traits>& in,
                     output_mixin,output_previous,
                     stream_mixin, multiplier_mixin>& rng)
 {
-    using pcg_extras::operator>>;
 
     auto orig_flags = in.flags(std::ios_base::dec | std::ios_base::skipws);
 
@@ -1437,7 +1429,6 @@ operator<<(std::basic_ostream<CharT,Traits>& out,
            const extended<table_pow2, advance_pow2,
                           baseclass, extvalclass, kdd>& rng)
 {
-    using pcg_extras::operator<<;
 
     auto orig_flags = out.flags(std::ios_base::dec | std::ios_base::left);
     auto space = out.widen(' ');
@@ -1470,7 +1461,6 @@ operator>>(std::basic_istream<CharT,Traits>& in,
     if (in.fail())
         return in;
 
-    using pcg_extras::operator>>;
 
     auto orig_flags = in.flags(std::ios_base::dec | std::ios_base::skipws);
 

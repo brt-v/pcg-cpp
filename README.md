@@ -92,14 +92,13 @@ The PCG random number generators are great, but the C++ implementation is a bit 
 
 - [x] Convert library and tests to CMake, such that it's easy to use in your projects
 - [x] Convert the tests to CTest, make them run on Linux
-  - [ ] and Windows (some tests fails. Output is identical, but object size are different, I suspect due to EBO)
+  - [x] and Windows (some tests fails. Output is identical, but object size are different, I suspect due to EBO)
 - Clean up code
   - [x] Make sure it compiles with high error levels
   - [x] Remove unneeded includes
-  - [ ] Put everything in namespace `pcg`
   - [x] Apply some modern (C++17) best practices
-  - [ ] Split some parts in separate headers to make the base RNG's a lightweight include
-- [ ] Add Github actions, make sure tests run on Linux and Windows
+  - [x Split some parts in separate headers to make the base RNG's a lightweight include
+- [x] Add Github actions, make sure tests run on Linux and Windows
 - [ ] Check with static analysis 
 - [ ] Add clang format
 

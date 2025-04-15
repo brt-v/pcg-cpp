@@ -32,6 +32,7 @@
 #include <iostream>
 #include <random>
 #include "pcg//pcg_random.hpp"
+#include "pcg//pcg_extras.hpp"
 
 #ifdef _MSC_VER
     #include <io.h>

@@ -34,6 +34,7 @@
 #include <string.h>     // for strcmp
 
 #include "pcg/pcg_random.hpp"
+#include "pcg//pcg_extras.hpp"
 
 // This code can be compiled with the preprocessor symbol RNG set to the
 // PCG generator you'd like to test.
@@ -47,7 +48,7 @@
 #define STRINGIFY(x)      STRINGIFY_IMPL(x)
 
 using namespace std;
-using pcg_extras::operator<<;
+
 
 int main(int argc, char** argv)
 {
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
         --argc;
     }
     if (argc > 0) {
-        rounds = atoi(argv[0]);
+        rounds = std::atoi(argv[0]);
     }
 
     /* Many of the generators can be initialized with two arguments; the second

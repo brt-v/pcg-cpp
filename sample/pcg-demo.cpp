@@ -33,6 +33,7 @@
 #include <numeric>      // for std::iota
 
 #include "pcg/pcg_random.hpp"
+#include "pcg//pcg_extras.hpp"
 
 
 // This code can be compiled with the preprocessor symbol RNG set to the

@@ -34,6 +34,7 @@
 #include <string.h>     // for strcmp
 
 #include "pcg/pcg_random.hpp"
+#include "pcg/pcg_extras.hpp"
 
 // This code can be compiled with the preprocessor symbol RNG set to the
 // PCG generator you'd like to test.

@@ -39,7 +39,8 @@
 #include <random>
 
 #include "pcg/pcg_random.hpp"
- 
+#include "pcg//pcg_extras.hpp"
+
 int main()
 {
     // Seed with a real random value, if available
