@@ -73,7 +73,7 @@
 
 #include <cstdint>
 #include <cassert>
-#include <iosfwd>
+#include <iostream>
 
 #ifdef _MSC_VER
     #pragma warning(disable:4146)
@@ -461,7 +461,7 @@ public:
                && !std::is_convertible<SeedSeq, itype>::value
                && !std::is_convertible<SeedSeq, engine>::value,
                no_specifiable_stream_tag>::type = {})
-        : engine(generate_one<itype>(std::forward<SeedSeq>(seedSeq)))
+        : engine(pcg_extras::generate_one<itype>(std::forward<SeedSeq>(seedSeq)))
     {
         // Nothing else to do.
     }
@@ -485,16 +485,14 @@ public:
         new (this) engine(std::forward<Args>(args)...);
     }
 
-    template <typename xtype1, typename itype1,
-              typename output_mixin1, bool output_previous1,
-              typename stream_mixin_lhs, typename multiplier_mixin_lhs,
-              typename stream_mixin_rhs, typename multiplier_mixin_rhs>
-    friend bool operator==(const engine<xtype1,itype1,
-                                     output_mixin1,output_previous1,
-                                     stream_mixin_lhs, multiplier_mixin_lhs>&,
-                           const engine<xtype1,itype1,
-                                     output_mixin1,output_previous1,
-                                     stream_mixin_rhs, multiplier_mixin_rhs>&);
+
+    friend bool operator==(const engine& lhs, const engine& rhs)
+	{
+		return    (lhs.Multiplier == rhs.Multiplier)
+			&& (lhs.increment() == rhs.increment())
+			&& (lhs.state_ == rhs.state_);
+	}
+
 
     template <typename xtype1, typename itype1,
               typename output_mixin1, bool output_previous1,
@@ -507,87 +505,53 @@ public:
                                      output_mixin1,output_previous1,
                                      stream_mixin_rhs, multiplier_mixin_rhs>&);
 
-    template <typename CharT, typename Traits,
-              typename xtype1, typename itype1,
-              typename output_mixin1, bool output_previous1,
-              typename stream_mixin1, typename multiplier_mixin1>
-    friend std::basic_ostream<CharT,Traits>&
-    operator<<(std::basic_ostream<CharT,Traits>& out,
-               const engine<xtype1,itype1,
-                              output_mixin1,output_previous1,
-                              stream_mixin1, multiplier_mixin1>&);
+    friend std::ostream& operator<<(std::ostream& out, const engine& rng) 
+    {
+		auto orig_flags = out.flags(std::ios_base::dec | std::ios_base::left);
+		auto space = out.widen(' ');
+		auto orig_fill = out.fill();
 
-    template <typename CharT, typename Traits,
-              typename xtype1, typename itype1,
-              typename output_mixin1, bool output_previous1,
-              typename stream_mixin1, typename multiplier_mixin1>
-    friend std::basic_istream<CharT,Traits>&
-    operator>>(std::basic_istream<CharT,Traits>& in,
-               engine<xtype1, itype1,
-                        output_mixin1, output_previous1,
-                        stream_mixin1, multiplier_mixin1>& rng);
-};
+		out << rng.Multiplier << space
+			<< rng.increment() << space
+			<< rng.state_;
 
-template <typename CharT, typename Traits,
-          typename xtype, typename itype,
-          typename output_mixin, bool output_previous,
-          typename stream_mixin, typename multiplier_mixin>
-std::basic_ostream<CharT,Traits>&
-operator<<(std::basic_ostream<CharT,Traits>& out,
-           const engine<xtype,itype,
-                          output_mixin,output_previous,
-                          stream_mixin, multiplier_mixin>& rng)
-{
-
-    auto orig_flags = out.flags(std::ios_base::dec | std::ios_base::left);
-    auto space = out.widen(' ');
-    auto orig_fill = out.fill();
-
-    out << rng.Multiplier << space
-        << rng.increment() << space
-        << rng.state_;
-
-    out.flags(orig_flags);
-    out.fill(orig_fill);
-    return out;
-}
-
-
-template <typename CharT, typename Traits,
-          typename xtype, typename itype,
-          typename output_mixin, bool output_previous,
-          typename stream_mixin, typename multiplier_mixin>
-std::basic_istream<CharT,Traits>&
-operator>>(std::basic_istream<CharT,Traits>& in,
-           engine<xtype,itype,
-                    output_mixin,output_previous,
-                    stream_mixin, multiplier_mixin>& rng)
-{
-
-    auto orig_flags = in.flags(std::ios_base::dec | std::ios_base::skipws);
-
-    itype multiplier, increment, state;
-    in >> multiplier >> increment >> state;
-
-    if (!in.fail()) {
-        bool good = true;
-        if (multiplier != rng.Multiplier) {
-           good = false;
-        } else if (rng.can_specify_stream) {
-           rng.set_stream(increment >> 1);
-        } else if (increment != rng.increment()) {
-           good = false;
-        }
-        if (good) {
-            rng.state_ = state;
-        } else {
-            in.clear(std::ios::failbit);
-        }
+		out.flags(orig_flags);
+		out.fill(orig_fill);
+		return out;
     }
 
-    in.flags(orig_flags);
-    return in;
-}
+    friend std::istream& operator>>(std::istream& in, engine& rng)
+    {
+		auto orig_flags = in.flags(std::ios_base::dec | std::ios_base::skipws);
+
+		itype multiplier, increment, state;
+		in >> multiplier >> increment >> state;
+
+		if (!in.fail()) {
+			bool good = true;
+			if (multiplier != rng.Multiplier) {
+				good = false;
+			}
+			else if (rng.can_specify_stream) {
+				rng.set_stream(increment >> 1);
+			}
+			else if (increment != rng.increment()) {
+				good = false;
+			}
+			if (good) {
+				rng.state_ = state;
+			}
+			else {
+				in.clear(std::ios::failbit);
+			}
+		}
+
+		in.flags(orig_flags);
+		return in;
+    }
+};
+
+
 
 
 template <typename xtype, typename itype,
@@ -673,22 +637,6 @@ itype operator-(const engine<xtype,itype,
     }
 }
 
-
-template <typename xtype, typename itype,
-          typename output_mixin, bool output_previous,
-          typename stream_mixin_lhs, typename multiplier_mixin_lhs,
-          typename stream_mixin_rhs, typename multiplier_mixin_rhs>
-bool operator==(const engine<xtype,itype,
-                               output_mixin,output_previous,
-                               stream_mixin_lhs, multiplier_mixin_lhs>& lhs,
-                const engine<xtype,itype,
-                               output_mixin,output_previous,
-                               stream_mixin_rhs, multiplier_mixin_rhs>& rhs)
-{
-    return    (lhs.Multiplier == rhs.Multiplier)
-           && (lhs.increment()  == rhs.increment())
-           && (lhs.state_       == rhs.state_);
-}
 
 template <typename xtype, typename itype,
           typename output_mixin, bool output_previous,
