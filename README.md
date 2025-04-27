@@ -68,13 +68,19 @@ cmake --build build/
 
 ### Running tests
 
-Pull this repository, then:
+Windows:
 ```bash
 cmake . -B build
 cmake --build build/ --config Release
 ctest -C Release --test-dir build/
 ```
 
+Linux:
+```bash
+cmake . -B build
+cmake -DCMAKE_BUILD_TYPE=Release --build build/
+ctest --test-dir build/
+```
 
 ## Directory Structure
 
@@ -90,15 +96,14 @@ The directories are arranged as follows:
 
 The PCG random number generators are great, but the C++ implementation is a bit outdated and unmaintained. This fork is made with the following goals:
 
-- [x] Convert library and tests to CMake, such that it's easy to use in your projects
-- [x] Convert the tests to CTest, make them run on Linux
-  - [x] and Windows (some tests fails. Output is identical, but object size are different, I suspect due to EBO)
-- Clean up code
-  - [x] Make sure it compiles with high error levels
-  - [x] Remove unneeded includes
-  - [x] Apply some modern (C++17) best practices
-  - [x Split some parts in separate headers to make the base RNG's a lightweight include
+- [x] Target C++17 and use modern best practices
+- [x] Convert library and tests to CMake, such that it's easily imported with `FetchContent`
+- [x] Make sure it compiles with high warning levels with MSCV, gcc and clang
+- [x] Removed many unneeded includes 
+- [x] Moved optional funcionality to separate header (`pcg_extras.hpp`) to make the base RNG (`pcg_random.hpp`) a lightweight include
+- [x] Convert the tests to CTest
+- [x] Fixed some tests on Windows, that fail in the upstream repository
 - [x] Add Github actions, make sure tests run on Linux and Windows
-- [ ] Check with static analysis 
+- [x] On Widows, use MSVC's built-in 128 bit integer if it's available
 - [ ] Add clang format
 
