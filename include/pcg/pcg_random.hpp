@@ -593,8 +593,7 @@ itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
     itype cur_state, itype newstate, itype cur_mult, itype cur_plus, itype mask)
 {
     constexpr itype ONE  = 1u;  // itype could be weird, so use constant
-    bool is_mcg = cur_plus == itype(0);
-    itype the_bit = is_mcg ? itype(4u) : itype(1u);
+    itype the_bit = engine::is_mcg ? itype(4u) : itype(1u);
     itype distance = 0u;
     while ((cur_state & mask) != (newstate & mask)) {
        if ((cur_state & the_bit) != (newstate & the_bit)) {
@@ -606,7 +605,7 @@ itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
        cur_plus = (cur_mult+ONE)*cur_plus;
        cur_mult *= cur_mult;
     }
-    return is_mcg ? distance >> 2 : distance;
+    return engine::is_mcg ? distance >> 2 : distance;
 }
 
 template <typename xtype, typename itype,
@@ -1495,11 +1494,11 @@ void extended<table_pow2,advance_pow2,baseclass,extvalclass,kdd>::advance(
             advance_table(ticks, forwards);
     }
     if (forwards) {
-        if (may_tock && this->distance(zero) <= distance)
+        if constexpr (may_tock && this->distance(zero) <= distance)
             advance_table();
         baseclass::advance(distance);
     } else {
-        if (may_tock && -(this->distance(zero)) <= distance)
+        if constexpr (may_tock && -(this->distance(zero)) <= distance)
             advance_table(state_type(1U), false);
         baseclass::advance(-distance);
     }
