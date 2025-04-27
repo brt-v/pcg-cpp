@@ -283,7 +283,7 @@ public:
         return inc_;
     }
 
-    [[nodiscard]] constexpr  itype stream() const
+    [[nodiscard]] constexpr itype stream() const
     {
          return inc_ >> 1;
     }
@@ -301,9 +301,9 @@ public:
     }
 
 protected:
-    specific_stream() = default;
+    constexpr specific_stream() = default;
 
-    specific_stream(itype specific_seq)
+    constexpr specific_stream(itype specific_seq)
         : inc_(itype(specific_seq << 1) | itype(1U))
     {
         // Nothing (else) to do.
@@ -397,13 +397,13 @@ public:
     }
 
 protected:
-    static itype advance(itype state, itype delta,
+    static constexpr itype advance(itype state, itype delta,
                          itype cur_mult, itype cur_plus);
 
-    static itype distance(itype cur_state, itype newstate, itype cur_mult,
+    static constexpr itype distance(itype cur_state, itype newstate, itype cur_mult,
                           itype cur_plus, itype mask = ~itype(0U));
 
-    [[nodiscard]] itype distance(itype newstate, itype mask = itype(~itype(0U))) const
+    [[nodiscard]] constexpr itype distance(itype newstate, itype mask = itype(~itype(0U))) const
     {
         return distance(state_, newstate, Multiplier, increment(), mask);
     }
@@ -557,7 +557,7 @@ public:
 template <typename xtype, typename itype,
           typename output_mixin, bool output_previous,
           typename stream_mixin, typename multiplier_mixin>
-itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
+constexpr itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
              multiplier_mixin>::advance(
     itype state, itype delta, itype cur_mult, itype cur_plus)
 {
@@ -588,7 +588,7 @@ itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
 template <typename xtype, typename itype,
           typename output_mixin, bool output_previous,
           typename stream_mixin, typename multiplier_mixin>
-itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
+constexpr itype engine<xtype,itype,output_mixin,output_previous,stream_mixin,
                multiplier_mixin>::distance(
     itype cur_state, itype newstate, itype cur_mult, itype cur_plus, itype mask)
 {

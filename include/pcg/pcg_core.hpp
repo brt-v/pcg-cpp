@@ -109,13 +109,13 @@ namespace pcg_extras {
  */
 
 /*
- * XorShifts are invertable, but they are someting of a pain to invert.
+ * XorShifts are invertible, but they are something of a pain to invert.
  * This function backs them out.  It's used by the whacky "inside out"
  * generator defined later.
  */
 
  template <typename itype>
- inline itype unxorshift(itype x, bitcount_t bits, bitcount_t shift)
+ constexpr itype unxorshift(itype x, bitcount_t bits, bitcount_t shift)
  {
      if (2*shift >= bits) {
          return x ^ (x >> shift);
@@ -144,7 +144,7 @@ namespace pcg_extras {
   */
  
  template <typename itype>
- inline itype rotl(itype value, bitcount_t rot)
+ constexpr itype rotl(itype value, bitcount_t rot)
  {
      constexpr bitcount_t bits = sizeof(itype) * 8;
      constexpr bitcount_t mask = bits - 1;
@@ -156,7 +156,7 @@ namespace pcg_extras {
  }
  
  template <typename itype>
- inline itype rotr(itype value, bitcount_t rot)
+ constexpr itype rotr(itype value, bitcount_t rot)
  {
      constexpr bitcount_t bits = sizeof(itype) * 8;
      constexpr bitcount_t mask = bits - 1;
@@ -259,7 +259,7 @@ namespace pcg_extras {
  /* uneven_copy helper, case where destination ints are less than 32 bit. */
 
 template<class SrcIter, class DestIter>
-SrcIter uneven_copy_impl(
+constexpr SrcIter uneven_copy_impl(
     SrcIter src_first, DestIter dest_first, DestIter dest_last,
     std::true_type)
 {
@@ -288,7 +288,7 @@ SrcIter uneven_copy_impl(
  /* uneven_copy helper, case where destination ints are more than 32 bit. */
 
 template<class SrcIter, class DestIter>
-SrcIter uneven_copy_impl(
+constexpr SrcIter uneven_copy_impl(
     SrcIter src_first, DestIter dest_first, DestIter dest_last,
     std::false_type)
 {
@@ -317,7 +317,7 @@ SrcIter uneven_copy_impl(
 /* uneven_copy, call the right code for larger vs. smaller */
 
 template<class SrcIter, class DestIter>
-inline SrcIter uneven_copy(SrcIter src_first,
+constexpr SrcIter uneven_copy(SrcIter src_first,
                            DestIter dest_first, DestIter dest_last)
 {
     using src_t  = typename std::iterator_traits<SrcIter>::value_type;
@@ -334,14 +334,14 @@ inline SrcIter uneven_copy(SrcIter src_first,
  */
 
 template <size_t size, typename SeedSeq, typename DestIter>
-inline void generate_to_impl(SeedSeq&& generator, DestIter dest,
+constexpr void generate_to_impl(SeedSeq&& generator, DestIter dest,
                              std::true_type)
 {
     generator.generate(dest, dest+size);
 }
 
 template <size_t size, typename SeedSeq, typename DestIter>
-void generate_to_impl(SeedSeq&& generator, DestIter dest,
+constexpr void generate_to_impl(SeedSeq&& generator, DestIter dest,
                       std::false_type)
 {
     using dest_t = typename std::iterator_traits<DestIter>::value_type;
@@ -370,7 +370,7 @@ void generate_to_impl(SeedSeq&& generator, DestIter dest,
 }
 
 template <size_t size, typename SeedSeq, typename DestIter>
-inline void generate_to(SeedSeq&& generator, DestIter dest)
+constexpr void generate_to(SeedSeq&& generator, DestIter dest)
 {
     using dest_t = typename std::iterator_traits<DestIter>::value_type;
     constexpr bool IS_32BIT = sizeof(dest_t) == sizeof(uint32_t);
@@ -385,7 +385,7 @@ inline void generate_to(SeedSeq&& generator, DestIter dest)
  */
 
 template <typename UInt, size_t i = 0UL, size_t N = i + 1UL, typename SeedSeq>
-inline UInt generate_one(SeedSeq&& generator)
+constexpr UInt generate_one(SeedSeq&& generator)
 {
     UInt result[N];
     generate_to<N>(std::forward<SeedSeq>(generator), result);
@@ -394,7 +394,7 @@ inline UInt generate_one(SeedSeq&& generator)
 
 
 template <typename RngType>
-auto bounded_rand(RngType& rng, typename RngType::result_type upper_bound)
+constexpr auto bounded_rand(RngType& rng, typename RngType::result_type upper_bound)
 -> typename RngType::result_type
 {
 	using rtype = typename RngType::result_type;
