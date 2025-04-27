@@ -70,7 +70,7 @@ namespace pcg_extras {
      using  pcg128_t = __uint128_t;
  }
  #define PCG_128BIT_CONSTANT(high,low) \
-         ((pcg_extras::pcg128_t(high) << 64) + low)
+         ((pcg_extras::pcg128_t(high) << 64) + (low))
 #elif __has_include(<__msvc_int128.hpp>)
  #include <__msvc_int128.hpp>
  namespace pcg_extras {
@@ -398,10 +398,10 @@ auto bounded_rand(RngType& rng, typename RngType::result_type upper_bound)
 -> typename RngType::result_type
 {
 	using rtype = typename RngType::result_type;
-	rtype threshold = (RngType::max() - RngType::min() + rtype(1) - upper_bound)
+	const rtype threshold = (RngType::max() - RngType::min() + rtype(1) - upper_bound)
 		% upper_bound;
 	for (;;) {
-		rtype r = rng() - RngType::min();
+		const rtype r = rng() - RngType::min();
 		if (r >= threshold)
 			return r % upper_bound;
 	}
