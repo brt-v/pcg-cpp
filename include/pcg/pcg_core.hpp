@@ -86,7 +86,6 @@ namespace pcg_extras {
 #endif
 
 #include <type_traits>
-#include <iterator>
 
 namespace pcg_extras {
 

@@ -23,11 +23,11 @@
  * Outputs a little spy codebook
  */
 
-#include "pcg/pcg_random.hpp"
-#include "pcg/pcg_extras.hpp"
 #include <cstdio>
 #include <iostream>
 #include <random>
+#include "pcg/pcg_random.hpp"
+#include "pcg/pcg_extras.hpp"
 
 int main()
 {
